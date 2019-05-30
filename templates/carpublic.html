@@ -1,0 +1,68 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+
+<header class="subheader"> 
+        <nav class="main-nav">
+          <div class="left">
+          <ul>
+			  <li><a href="{{url_for('showCars', brand_id=brand.id)}}"><p>{{brand.name}}</p></a></li>
+            </ul>
+              </div>
+        </nav>
+      </header>
+	  <br/><br/>
+      <div class="tm-item-container">
+            <img src="./2.jpg" alt="Image">
+        </div>
+      <div class="main-content">
+          <table class="car-table">
+              <tr>
+                  <td rowspan="4">
+                        <div class="tm-item-container">
+                            <img src="./static/2.jpg" alt="Image">                            
+                        </div>
+                  </td>
+              
+                  <td colspan="2">{{car.model}} {{brand.name}} {{car.name}}</td>
+              </tr>
+              <tr>
+                  <td colspan="2"> $ {{car.price}}</td>
+              </tr>
+              <tr>
+                  <td colspan="2">Condition: {{car.condition}}</td>
+              </tr>
+              <tr>
+                  <td>
+                      {% if specs != [] %}
+                      <ul> Specs:
+                          {% for i in specs %}
+                          <!-- <p>1</p> -->
+                          <li>{{i}}</li>
+                          {% endfor %}
+                      </ul>
+                      {% endif %}
+                  </td>
+                  <td>
+                        {% if highlights != [] %}
+                      <ul>Highlights:
+                          {% for i in highlights %}
+                          <li>{{i}}</li>
+                          {% endfor %}
+                    </ul>
+                        {% endif %}
+                  </td>
+              </tr>
+              <tr>
+                 <td colspan="2"> Color: {{car.color}}</td>
+              </tr>
+              <tr>
+                  <td colspan="2">Description:<br/>{{car.description}}</td>
+              </tr>
+
+          </table>
+      </div>
+        
+                
+                            
+{% endblock %}

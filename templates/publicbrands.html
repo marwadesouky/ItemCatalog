@@ -1,0 +1,32 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+
+
+<header class="subheader"> 
+        <nav class="main-nav">
+          <div class="left">
+          <ul>
+              <li>
+                <a href="{{ url_for('newBrand') }}"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New Brand</a></li>
+            </ul>
+              </div>
+        </nav>
+      </header>
+      <br/><br/>
+
+<div class="main-content">
+    {% for brand in brands %}
+    <div class="tm-item-container">
+            <img src="./static/2.jpg" alt="Image">
+            <div class="tm-item-name-container">
+              <a class="name" href="{{url_for('showCars', brand_id=brand.id)}}"><span class="tm-item-name">{{brand.name}}</span></a>
+              <a href="#" class="tm-item-link"> 
+              </a>
+            </div>
+          </div>
+    {% endfor %}
+</div>
+
+
+{% endblock %}

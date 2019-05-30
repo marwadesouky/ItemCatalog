@@ -1,0 +1,107 @@
+{% extends "main.html" %}
+{% block content %}
+    <header>
+        
+        <nav class="main-nav">
+          <div class="left">
+          <ul>
+              <li><a href="{{ url_for('showBrands') }}">All Brands</a></li>
+              <li><a href="{{url_for('allCars')}}">All Cars</a></li>
+            </ul>
+              </div>
+              <div class="right">
+              <ul>
+                {%if 'username' not in session %}
+                <li><a href="{{ url_for('login') }}">Login</a></li>
+                {% else %}
+                <li><p>{{session['username']}}</p></li>
+                <li><a href="#" onclick="signOut();">Logout </a></li>
+                {% endif %}
+            </ul>
+          </div>
+        </nav>
+        
+      </header>
+      <br/>
+
+      <section id="video" class="home">
+          </section>
+          
+
+<script>
+        function signOut() {
+          var auth2 = gapi.auth2.getAuthInstance();
+          var gstatus = gapi.auth2.getAuthInstance().isSignedIn.get();
+          
+          console.log("status = ", status);
+          console.log("auth2 = ", auth2);
+          if(status){
+              signOut();
+          }
+          else {
+            var fbstatus = FB.getLoginStatus(function(response) {
+                fbLogout();
+            });
+          }
+        }
+    
+        function onLoad() {
+          gapi.load('auth2', function() {
+            gapi.auth2.init();
+          });
+        }
+
+        function gSignOut(){
+            var auth2 = gapi.auth2.getAuthInstance();
+            auth2.signOut().then(function () {
+            console.log('User signed out.');
+            $.ajax({
+                type: 'POST',
+                url: $(location).attr('origin') + '/disconnect',
+                processData: false,                
+                contentType: 'application/octet-stream; charset=utf-8',
+                success: function(result){
+                    if (result) {
+                        $('#result').html('Logout Successful!</br>'+ result + '</br>Redirecting...')
+                        setTimeout(
+                            function() {
+                            window.location.href = "/home";
+                        }, 
+                        4000);
+                    } else {
+                        $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+                    }
+                }
+            })
+          });
+        }
+
+        function fbLogout(){
+            FB.logout(function() {
+                $.ajax({
+                type: 'POST',
+                url: '/fbdisconnect?state={{STATE}}',
+                processData: false,
+                // data: access_token,
+                contentType: 'application/octet-stream; charset=utf-8',
+                success: function(result) {
+                    console.log("Result = ", result);
+                    // Handle or verify the server response if necessary.
+                    if (result) {
+                        $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+                        setTimeout(
+                            function() {
+                            window.location.href = "/home";
+                        }, 
+                        4000);
+            
+                    } else {
+                        $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+                    }
+            }
+        });
+        });
+        }
+</script>
+
+{% endblock %}

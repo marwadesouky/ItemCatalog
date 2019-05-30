@@ -1,0 +1,130 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+
+<!-- <div class="row divider green">
+    <div class="col-md-12"></div>
+</div> -->
+<div class="row banner menu">
+    <div class="col-md-11 col-md-offset-1 padding-none">
+        <h1>Edit {{brand.name}} {{car.name}}</h1>
+    </div>
+</div>
+
+<div>
+    <form action="{{url_for('newCar',brand_id=brand.id)}}" method='POST'>
+        <table>
+            <tr>
+                <td>
+                    <label for="name">Name:</label>
+                    <div class="input-group">  
+                      <input type ="text" class="form-control" name="name"placeholder="Name of the course">
+                    </div>
+                </td>
+                <td>
+                    <label for="model">Model:</label>
+                <div class="input-group">
+                    <input type ="text" class="form-control" maxlength="200" name="model" placeholder="Model">
+                </div>
+                </td>
+            </tr>
+            
+            <tr>
+                <td>
+                    <label for="price">Price:</label>
+                    <div class="input-group">
+                    <div class="input-group-addon" style="width: 10px;">$</div>
+                        <input type ="text" class="form-control" maxlength="200" name="price" placeholder="Price in $">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label for="condition">Condition:</label>
+                    <div class="input-group">
+                        <input type ="text" class="form-control" maxlength="200" name="condition" placeholder="Car Condition">
+                    </div>
+                </td>
+                <td>
+                    <label for="color">Color:</label>
+                    <div class="input-group">
+                        <input type ="text" class="form-control" maxlength="200" name="color" placeholder="Color">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td style="position: relative; top:0; vertical-align: top;">
+                    <div class="multi-input-div" style="position: relative;">
+                        
+                            <label class="input-lbl" for="Specs"> Specs:</label>
+                            <input type="button" onClick="addSpecs(event);" maxlength="200" id="addspecs" value="+"><br/><br/>
+                        
+                        <div  class="input-group" id="specs-div">
+                            <input type ="text" class="form-control" maxlength="10" name="specs" placeholder=""><br/>
+                        </div>
+                    </div>
+                        
+                    
+                </td>
+                <td style="position: relative; top:0; vertical-align: top;">
+                        <div class="multi-input-div" style="position: relative;">
+                        <label class="input-lbl" for="Highlights"> Highlights:</label>
+                        <input type="button" onClick="addHighlights(event);" maxlength="10" id="addhighlights" value="+"><br/><br/>
+                        <div  class="input-group"  id="highlights-div">
+                            <input type ="text" class="form-control" maxlength="200" name="highlights" placeholder=""><br/>
+                        </div>
+                        </div>
+                    
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <label for="description">Description:</label>
+                    <textarea class="form-control" maxlength="250" rows="3" name="description" placeholder="Description of the course"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                        <div  id="group-file" class="form-group">
+                                
+                                <input type ="file" class="form_control" maxlength="10" name="image" id="file" placeholder="Upload image"><br/>
+            
+                            </div>
+                </td>
+            </tr>
+        </table>
+    </br></br></br></br>
+    
+    </form>
+</div>
+
+<script language="javascript" type="text/javascript">
+
+  function addSpecs(event){
+    event.preventDefault();
+    var div = document.getElementById("specs-div");
+    var input = document.createElement("input");
+    input.type = "text";
+    input.className = "form-control";
+    input.setAttribute("name", "specs");
+    // input.setAttribute("class", "for-control")
+    var br = document.createElement("br");
+    div.appendChild(input);
+    div.appendChild(br);
+  }
+
+  function addHighlights(event){
+    event.preventDefault();
+    var div = document.getElementById("highlights-div");
+    var input = document.createElement("input");
+    input.type = "text";
+    input.className = "form-control";
+    input.setAttribute("name", "highlights")
+    var br = document.createElement("br");
+    div.appendChild(input);
+    div.appendChild(br);
+  }
+</script>
+  
+
+{% endblock %}

@@ -1,0 +1,270 @@
+{% extends "main.html" %}
+{% block content %}
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> 
+  
+
+    <div id="status"></div>
+    <div id="userData"></div>
+    <div class="login-form">
+        <form action="/examples/actions/confirmation.php" method="post">
+            <h2 class="text-center">Sign in</h2>		
+            <div class="text-center social-btn">
+                <a href="javascript:void(0);" id="fbLogin" onclick="fbLogin();"  class="btn btn-primary btn-block"><i class="fa fa-facebook"></i> Sign in with <b>Facebook</b></a>
+                <a href="javascript:void(0);" id="fbLogout" onclick="fbLogout();"  class="btn btn-primary btn-block" style="display: none;"><i class="fa fa-facebook"></i> Sign Out from <b>Facebook</b></a>
+                <div class="g-signin2" data-width="280" data-onsuccess="onSignIn" id="signInButton"></div>
+			<a href="#" onclick="signOut();" id="signOutButton" class="btn btn-danger btn-block" style="display: none;"><i class="fa fa-google"></i> Sign Out</a>
+        </div>
+		<div class="or-seperator"><i>or</i></div>
+        <div class="form-group">
+        	<div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                <input type="text" class="form-control" name="username" placeholder="Username" required="required">
+            </div>
+        </div>
+		<div class="form-group">
+            <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+                <input type="password" class="form-control" name="password" placeholder="Password" required="required">
+            </div>
+        </div>        
+        <div class="form-group">
+            <button type="submit" class="btn btn-success btn-block login-btn">Sign in</button>
+        </div>
+        <div class="clearfix">
+            <label class="pull-left checkbox-inline"><input type="checkbox"> Remember me</label>
+            <a href="#" class="pull-right text-success">Forgot Password?</a>
+        </div>  
+        
+    </form>
+    <div class="hint-text small">Don't have an account? <a href="#" class="text-success">Register Now!</a></div>
+</div>
+
+</html>               
+<script>
+    window.fbAsyncInit = function() {
+      FB.init({
+        appId      : '1964910873612746',
+        cookie     : true,
+        xfbml      : true,
+        version    : 'v3.3'
+      });
+        
+      FB.AppEvents.logPageView();   
+        
+    };
+  
+    (function(d, s, id){
+       var js, fjs = d.getElementsByTagName(s)[0];
+       if (d.getElementById(id)) {return;}
+       js = d.createElement(s); js.id = id;
+       js.src = "https://connect.facebook.net/en_US/sdk.js";
+       fjs.parentNode.insertBefore(js, fjs);
+     }(document, 'script', 'facebook-jssdk'));
+
+    // Facebook login with JavaScript SDK
+    function fbLogin() {
+        var status = gapi.auth2.getAuthInstance().isSignedIn.get();
+        console.log("google user status = ", status);
+        
+        FB.getLoginStatus(function(response){
+            console.log("login status = ", response.status);
+        });
+        FB.login(function (response) {
+            if (response.authResponse) {
+                console.log(response);
+                if(status){
+                    signOut();
+                }
+                // Get and display the user profile data
+                $('#fbLogin').attr('style', 'display: none');
+			    $('#fbLogout').attr('style', 'display: True');
+                getFbUserData(response);
+            } else {
+                document.getElementById('status').innerHTML = 'User cancelled login or did not fully authorize.';
+            }
+        }, {scope: 'email'});
+    }
+    function getFbUserData(result){
+        var access_token = result.authResponse['accessToken']
+        console.log("access token = ", access_token);
+        FB.api('/me', {locale: 'en_US', fields: 'id,first_name,last_name,email,link,gender,locale,picture'},
+        function (response) {
+            document.getElementById('fbLogin').setAttribute("onclick","fbLogout()");
+            // document.getElementById('fbLogin').innerHTML = 'Logout from Facebook';
+            $.ajax({
+                type: 'POST',
+                url: '/fbconnect?state={{STATE}}',
+                processData: false,
+                data: access_token,
+                contentType: 'application/octet-stream; charset=utf-8',
+                success: function(result) {
+                    console.log("Result = ", result);
+                    // Handle or verify the server response if necessary.
+                    if (result) {
+                        $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+                        setTimeout(
+                        //     function() {
+                        //     window.location.href = "/welcome";
+                        // }, 
+                        4000);
+            
+                    } else {
+                        $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+                    }
+            }
+        });
+            // document.getElementById('status').innerHTML = 'Thanks for logging in, ' + response.first_name + '!';
+            // document.getElementById('userData').innerHTML = '<p><b>FB ID:</b> '+response.id+'</p><p><b>Name:</b> '+response.first_name+' '+response.last_name+'</p><p><b>Email:</b> '+response.email+'</p><p><b>Gender:</b> '+response.gender+'</p><p><b>Locale:</b> '+response.locale+'</p><p><b>Picture:</b> <img src="'+response.picture.data.url+'"/></p><p><b>FB Profile:</b> <a target="_blank" href="'+response.link+'">click to view profile</a></p>';
+        });
+    }
+    // Logout from facebook
+    function fbLogout() {
+        FB.logout(function() {
+            // document.getElementById('fbLogin').setAttribute("onclick","fbLogin()");
+            // document.getElementById('fbLogin').innerHTML = '<img src="fblogin.png"/>';
+            document.getElementById('userData').innerHTML = '';
+            document.getElementById('status').innerHTML = 'You have successfully logout from Facebook.';
+            $('#fbLogin').attr('style', 'display: True');
+			$('#fbLogout').attr('style', 'display: none');
+            $.ajax({
+                type: 'POST',
+                url: '/fbdisconnect?state={{STATE}}',
+                processData: false,
+                // data: access_token,
+                contentType: 'application/octet-stream; charset=utf-8',
+                success: function(result) {
+                    console.log("Result = ", result);
+                    // Handle or verify the server response if necessary.
+                    if (result) {
+                        $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+                        setTimeout(
+                        //     function() {
+                        //     window.location.href = "/welcome";
+                        // }, 
+                        4000);
+            
+                    } else {
+                        $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+                    }
+            }
+        });
+        });
+    }
+    function sendTokenToServer() {
+        console.log(FB.getAuthResponse());
+        var access_token = FB.getAuthResponse()['accessToken'];
+        console.log(access_token)
+        console.log('Welcome!  Fetching your information.... ');
+        FB.api('/me', function(response) {
+        console.log('Successful login for: ' + response.name);
+        $.ajax({
+        type: 'POST',
+        url: '/fbconnect?state={{STATE}}',
+        processData: false,
+        data: access_token,
+        contentType: 'application/octet-stream; charset=utf-8',
+        success: function(result) {
+            console.log("Result = ", result);
+        // Handle or verify the server response if necessary.
+            if (result) {
+            $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+            setTimeout(function() {
+            window.location.href = "/welcome";
+            }, 4000);
+            
+            } else {
+                $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+                }
+            }
+        });
+    });
+  }
+  
+
+    function checkLoginState() {
+        FB.getLoginStatus(function(response) {
+            statusChangeCallback(response);
+            });
+    }
+
+  </script>
+
+  <script>
+  function onSignIn(googleUser) {
+      console.log("google user = ", googleUser)
+        // Get the user id_token after the user signs it to his google account
+        var id_token = googleUser.getAuthResponse().id_token;
+        fb_status = FB.getLoginStatus(function(response){
+            if(response.status === "connected"){
+                fbLogout();
+            }
+        });
+
+        if (id_token) {
+            // Hide the sign-in button now that the user is authorized
+            // $('#signInButton').attr('style', 'display: none');
+            // $('#signOutButton').attr('style', 'display: True');
+            // Sending a post request
+            $('#signInButton').attr('style', 'display: none');
+			$('#signOutButton').attr('style', 'display: True');
+            $.ajax({
+                type: 'POST',
+                url: $(location).attr('origin') + '/gconnect?state={{ STATE }}',
+                processData: false,
+                data: id_token,
+                contentType: 'application/octet-stream; charset=utf-8',
+                success: function(result){
+                    if (result) {
+                        $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+                        setTimeout(
+                        //     function() {
+                        //     window.location.href = "/home";
+                        // },
+                         4000);
+                    } else {
+                        $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+                    }
+                }
+            });
+        }
+    }
+</script>
+<script>
+    function signOut() {
+        // $('#signOutButton').attr('style', 'display: none');
+        // $('#signInButton').attr('style', 'display: True');
+        var auth2 = gapi.auth2.getAuthInstance();
+        console.log("auth2 = ", auth2);
+        auth2.signOut().then(function () {
+            console.log(auth2);
+            console.log('User signed out.');
+            $('#signInButton').attr('style', 'display: True');
+			$('#signOutButton').attr('style', 'display: none');
+            $.ajax({
+                type: 'POST',
+                url: $(location).attr('origin') + '/disconnect',
+                processData: false,                
+                contentType: 'application/octet-stream; charset=utf-8',
+                success: function(result){
+                    if (result) {
+                        $('#result').html('Logout Successful!</br>'+ result + '</br>Redirecting...')
+                        setTimeout(
+                            function() {
+                            window.location.href = "/";
+                        }, 
+                        4000);
+                    } else {
+                        $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+                    }
+                }
+            });
+        });
+    }
+  </script>
+
+
+{% endblock %}

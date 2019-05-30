@@ -1,0 +1,25 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+
+<header class="subheader"> 
+        <nav class="main-nav">
+        </nav>
+      </header>
+	  <br/><br/>
+	
+	{% if cars !=[] %}	
+  <div class="main-content">
+		{% for car in cars %}
+		<div class="tm-item-container">
+				<img src="./2.jpg" alt="Image">
+				<div class="tm-item-name-container">
+				  <a class="name" href="{{url_for('showCar', brand_id=car.brand_id, car_id=car.id)}}"><span class="tm-item-name">{{car.name}}</span></a>
+				  <span class="tm-item-price">{{car.price}}</span>
+				  </a>
+				</div>
+			  </div>
+		{% endfor %}
+	</div>
+	{% endif %}
+{% endblock %}

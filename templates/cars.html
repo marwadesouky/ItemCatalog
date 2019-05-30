@@ -1,0 +1,52 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+
+<header class="subheader"> 
+        <nav class="main-nav">
+          <div class="left">
+          <ul>
+				<li><a href="{{url_for('showCars', brand_id=brand.id)}}"><p>{{brand.name}}</p></a></li>
+              <li>
+				<a href="{{ url_for('newCar', brand_id=brand.id) }}"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>New Car</a></li>
+				<li>
+					<a href="{{url_for('editBrand', brand_id=brand.id)}}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span>Edit Brand</a>
+				</li>
+				<li>
+					<a href="{{url_for('deleteBrand', brand_id=brand.id)}}"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span>Delete Brand</a>
+				</li>
+            </ul>
+              </div>
+        </nav>
+      </header>
+	  <br/><br/>
+	  <div class = 'flash'>
+		{% with messages = get_flashed_messages() %}
+			{% if messages %}
+	  		<ul>
+	  		{% for message in messages %}
+		  		<li> <strong> {{ message }} </strong> </li>
+	  		{% endfor %}
+	  		</ul>
+	  		{% endif %}
+  		{% endwith %}
+
+</div>
+	{% if cars !=[] %}	
+  <div class="main-content">
+		{% for car in cars %}
+		<div class="tm-item-container">
+				<img src="./2.jpg" alt="Image">
+					<a class="crud" href="{{url_for('editCar', brand_id = brand.id, car_id=car.id) }}">Edit</a> | 
+					<a class="crud" href="{{url_for('deleteCar', brand_id = brand.id, car_id=car.id) }}" method='POST'>Delete</a>
+				<div class="tm-item-name-container">
+				  <a class="name" href="{{url_for('showCar', brand_id=brand.id, car_id=car.id)}}"><span class="tm-item-name">{{car.name}}</span></a>
+				  <span class="tm-item-price">{{car.price}}</span>
+				  </a>
+				</div>
+			  </div>
+		{% endfor %}
+	</div>
+	{% endif %}
+	
+{% endblock %}
